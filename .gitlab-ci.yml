@@ -1,0 +1,7 @@
+image: node:10.15
+
+build_and_test:
+  tags: [docker]
+  script:
+    - npm install
+    - npm run all
