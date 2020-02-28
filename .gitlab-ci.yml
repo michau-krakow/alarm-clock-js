@@ -1,7 +1,26 @@
-image: node:10.15
 
-build_and_test:
+.test:
   tags: [docker]
   script:
     - npm install
     - npm run all
+
+# Initial version where Thread-safe Functions are no longer experimental
+# Also, version we use in DNM3
+test:node_10:
+  extends: .test
+  image: node:10.17
+
+test:node_11:
+  extends: .test
+  image: node:11
+
+# Latest LTS version
+test:node_12_LTS:
+  extends: .test
+  image: node:12
+
+# Latest version
+test:node_latest:
+  extends: .test
+  image: node:latest
