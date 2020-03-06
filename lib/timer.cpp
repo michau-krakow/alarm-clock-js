@@ -35,6 +35,7 @@ AlarmTimer::AlarmTimer(timer_callback_t callback) {
 }
 
 AlarmTimer::~AlarmTimer() {
+  cancel();
 }
 
 void AlarmTimer::set(std::chrono::milliseconds ms) {
@@ -54,3 +55,7 @@ void AlarmTimer::set(std::chrono::milliseconds ms) {
   DBG << "done\n";
 }
 
+void AlarmTimer::cancel() {
+  if (0 != timer_delete(timer_id))
+    throw std::runtime_error("Could not cancel timer");
+}

@@ -59,7 +59,16 @@ Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
 
   // TODO: memory leak
   AlarmTimer *alarm = new AlarmTimer(expirationFn);
+
+  auto cancelationFn = [alarm, tsFun](const Napi::CallbackInfo&) mutable -> Napi::Value {
+    delete alarm;
+    tsFun.Release();  // no longer required
+    return Napi::Value();
+  };
+
   alarm->set(std::chrono::milliseconds(milliseconds));
+
+  return Napi::Function::New(env, cancelationFn);
 }
 
 Napi::Object InitModule(Napi::Env env, Napi::Object exports) {

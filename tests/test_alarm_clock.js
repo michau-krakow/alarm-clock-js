@@ -52,4 +52,16 @@ describe('AlarmClock.setAlarm', function () {
     expect(aClock.setAlarm(done, 100));
   });
 
+  it('should return cancellation function', function () {
+    expect(aClock.setAlarm(()=>{}, 10)).to.be.a('function');
+  });
+
+  it('should be able to cancel running alarm', function (done) {
+    setTimeout(done, 200); // success, unless the timer fires earlier...
+
+    const cancelFn = aClock.setAlarm(() => done('Cancelled alarm should not fire!'), 100);
+    expect(cancelFn).to.be.a('function');
+    cancelFn();
+  });
+
 });

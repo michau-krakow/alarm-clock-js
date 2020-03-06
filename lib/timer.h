@@ -12,6 +12,8 @@ struct AlarmTimer {
 
   void set(std::chrono::milliseconds);
 
+  void cancel();
+
 private:
   timer_callback_t  callback;
   timer_t           timer_id;
