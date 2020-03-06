@@ -7,6 +7,21 @@ namespace AlarmClock {
 
 Napi::Value SetImmediate(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
+
+  if (info.Length() < 1) {
+    Napi::TypeError::New(env, "Wrong number of arguments")
+        .ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  if (!info[0].IsFunction()) {
+    Napi::TypeError::New(env, "Argument should be a function").ThrowAsJavaScriptException();
+    return env.Null();
+  }
+
+  Napi::Function cb = info[0].As<Napi::Function>();
+  cb.Call(env.Global(), {});
+
   return Napi::Value();
 }
 

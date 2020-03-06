@@ -16,3 +16,20 @@ describe('AlarmClock', function() {
   });
 });
 
+describe('AlarmClock.setImmediate', function () {
+  it('should throw when called with wrong arguments', function () {
+    const delay = 1;
+
+    expect(() => aClock.setImmediate()).to.throw(Error, /number of arguments/);
+    expect(() => aClock.setImmediate(delay)).to.throw(TypeError, /should be a function/);
+  });
+
+  it('should immediately call callback', function () {
+    var called = false;
+    const cb = () => called = true;
+
+    expect(aClock.setImmediate(cb)).to.be.equal(undefined);
+    expect(called).to.be.equal(true);
+  });
+});
+
