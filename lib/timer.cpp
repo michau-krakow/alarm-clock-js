@@ -38,6 +38,28 @@ AlarmTimer::~AlarmTimer() {
   cancel();
 }
 
+void AlarmTimer::set(std::chrono::time_point<std::chrono::system_clock> deadline)
+{
+  uint64_t ms =
+    std::chrono::duration_cast<std::chrono::milliseconds>
+      (deadline.time_since_epoch()).count();
+
+  struct itimerspec new_value = {
+      it_interval: {0, 0},
+      it_value: {
+        tv_sec: ms / 1000,
+        tv_nsec: (ms % 1000)*1000 // to nanoseconds
+      }
+  };
+
+  DBG << "Setting timer " << timer_id << " at " << ms << " ms...";
+
+  if (0 != timer_settime(timer_id, TIMER_ABSTIME, &new_value, nullptr))
+    throw std::runtime_error("Could not set timer for given time");
+
+  DBG << "done\n";
+}
+
 void AlarmTimer::set(std::chrono::milliseconds ms) {
   struct itimerspec new_value = {
       it_interval: {0, 0},

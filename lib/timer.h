@@ -10,6 +10,7 @@ struct AlarmTimer {
   AlarmTimer(AlarmTimer&&) = default;
   ~AlarmTimer();
 
+  void set(std::chrono::time_point<std::chrono::system_clock>);
   void set(std::chrono::milliseconds);
 
   void cancel();

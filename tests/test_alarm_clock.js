@@ -64,4 +64,26 @@ describe('AlarmClock.setAlarm', function () {
     cancelFn();
   });
 
+  it('should reject past date given as alarm time', function () {
+    const past = new Date(Date.now() - 10);
+
+    // make sure argument is a Date object
+    expect(past).to.be.a('Date');
+    expect(past.getTime()).to.be.lessThan(Date.now());
+
+    const nop = () => {};
+    expect(() => aClock.setAlarm(nop, past)).to.throw(Error, /cannot be in the past/);
+  });
+
+  it('should be able to schedule alarm at future Date', function (done) {
+    this.timeout(100);
+    const in1sec = new Date(Date.now() + 75);
+
+    // make sure argument is a Date object
+    expect(in1sec).to.be.a('Date');
+    expect(in1sec.getTime()).to.be.within(Date.now(), Date.now()+100);
+
+    expect(aClock.setAlarm(done, in1sec)).to.be.a('function');
+  });
+
 });

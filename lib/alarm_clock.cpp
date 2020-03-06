@@ -1,6 +1,13 @@
 #include <functional>
+#include <chrono>
+
 #include "debug.h"
 #include "timer.h"
+
+// At the time of writing, there is a Napi::Date class available in NAPI version 5.
+// However, NAPI 5 have only been released on Nodejs 10.15+ but is not released to Nodejs 12.x nor 13.x.
+// TODO: Remove when NAPI version 5 is made available for all Nodejs version.
+#include "js_date_object.h"
 
 #define NAPI_VERSION 4
 #define NAPI_CPP_EXCEPTIONS
@@ -38,8 +45,16 @@ Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
   if (!info[0].IsFunction())
     throw Napi::TypeError::New(env, "Argument should be a function");
 
-  Napi::Value value = info[1];
+  MaybeDate value(info[1]);
+  std::chrono::time_point<std::chrono::system_clock> time;
   int32_t milliseconds;
+
+  if (value.IsDate()) {
+    time = std::chrono::time_point<std::chrono::system_clock>(value.Milliseconds());
+    if (time < std::chrono::system_clock::now())
+      throw Napi::Error::New(env, "Timer expiration date cannot be in the past" );
+  }
+  else
   if (value.IsNumber()) {
     if ((milliseconds = value.As<Napi::Number>().Int32Value()) <= 0)
       throw Napi::Error::New(env, "A second argument should be greater than zero");
@@ -66,7 +81,10 @@ Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
     return Napi::Value();
   };
 
-  alarm->set(std::chrono::milliseconds(milliseconds));
+  if (value.IsDate())
+    alarm->set(time);
+  else
+    alarm->set(std::chrono::milliseconds(milliseconds));
 
   return Napi::Function::New(env, cancelationFn);
 }
