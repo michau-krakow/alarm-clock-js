@@ -1,3 +1,7 @@
+#include <functional>
+#include "debug.h"
+#include "timer.h"
+
 #define NAPI_VERSION 4
 #define NAPI_CPP_EXCEPTIONS
 #include "napi.h"
@@ -42,6 +46,20 @@ Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
   }
   else
     throw Napi::TypeError::New(env, "Second argument should be a date or number" );
+
+  Napi::Function callback = info[0].As<Napi::Function>();
+  Napi::ThreadSafeFunction tsFun =
+    Napi::ThreadSafeFunction::New(env, callback, "TimerCallback", /* max_queue_size */ 0, /* initial_thread_count */ 1);
+
+  auto expirationFn = [tsFun]() mutable {
+    auto status = tsFun.BlockingCall();
+    DBG << "Call Status = " << (status ? "ok" : "failed") << "\n";
+    tsFun.Release();
+  };
+
+  // TODO: memory leak
+  AlarmTimer *alarm = new AlarmTimer(expirationFn);
+  alarm->set(std::chrono::milliseconds(milliseconds));
 }
 
 Napi::Object InitModule(Napi::Env env, Napi::Object exports) {

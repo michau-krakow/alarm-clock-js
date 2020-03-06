@@ -47,4 +47,9 @@ describe('AlarmClock.setAlarm', function () {
     expect(() => aClock.setAlarm(cback, -1)).to.throw(Error, /should be greater than zero/);
   });
 
+  it('should be able to schedule alarm after given delay', function (done) {
+    this.timeout(200);
+    expect(aClock.setAlarm(done, 100));
+  });
+
 });
