@@ -33,3 +33,18 @@ describe('AlarmClock.setImmediate', function () {
   });
 });
 
+describe('AlarmClock.setAlarm', function () {
+  it('should throw when called with wrong arguments', function () {
+    const delay = 1;
+    const cback = () => {};
+
+    expect(() => aClock.setAlarm()).to.throw(Error, /number of arguments/);
+    expect(() => aClock.setAlarm(delay)).to.throw(Error, /number of arguments/);
+    expect(() => aClock.setAlarm(cback)).to.throw(Error, /number of arguments/);
+    expect(() => aClock.setAlarm(delay, delay)).to.throw(TypeError, /should be a function/);
+    expect(() => aClock.setAlarm(cback, cback)).to.throw(TypeError, /should be a date or number/);
+    expect(() => aClock.setAlarm(cback, 0)).to.throw(Error, /should be greater than zero/);
+    expect(() => aClock.setAlarm(cback, -1)).to.throw(Error, /should be greater than zero/);
+  });
+
+});

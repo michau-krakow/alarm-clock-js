@@ -27,6 +27,21 @@ Napi::Value SetImmediate(const Napi::CallbackInfo& info) {
 
 Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
+
+  if (info.Length() < 2)
+    throw Napi::Error::New(env, "Wrong number of arguments");
+
+  if (!info[0].IsFunction())
+    throw Napi::TypeError::New(env, "Argument should be a function");
+
+  Napi::Value value = info[1];
+  int32_t milliseconds;
+  if (value.IsNumber()) {
+    if ((milliseconds = value.As<Napi::Number>().Int32Value()) <= 0)
+      throw Napi::Error::New(env, "A second argument should be greater than zero");
+  }
+  else
+    throw Napi::TypeError::New(env, "Second argument should be a date or number" );
 }
 
 Napi::Object InitModule(Napi::Env env, Napi::Object exports) {
