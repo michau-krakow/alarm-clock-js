@@ -86,4 +86,13 @@ describe('AlarmClock.setAlarm', function () {
     expect(aClock.setAlarm(done, in1sec)).to.be.a('function');
   });
 
+  // it('should throw when scheduling alarm in the past', function () {
+  // });
+  // it('should not throw when cancelling old alarm', function () {
+  // });
+  // it('should not throw when cancelling alarm again', function () {
+  // });
+  // it('should not throw when cancelling alarm again', function () {
+  // });
+  // should be able to create more independent timers
 });
