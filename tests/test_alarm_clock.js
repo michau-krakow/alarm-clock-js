@@ -1,3 +1,4 @@
+const util = require('util');
 const { expect } = require('chai');
 
 const aClock = (() => {
@@ -86,10 +87,13 @@ describe('AlarmClock.setAlarm', function () {
     expect(aClock.setAlarm(done, in1sec)).to.be.a('function');
   });
 
-  // it('should throw when scheduling alarm in the past', function () {
-  // });
-  // it('should not throw when cancelling old alarm', function () {
-  // });
+  it('should not throw when cancelling old alarm', function (done) {
+    const cancel = aClock.setAlarm(() => {
+      util.inspect(cancel);
+      cancel();
+      done();
+    }, 50);
+  });
   // it('should not throw when cancelling alarm again', function () {
   // });
   // it('should not throw when cancelling alarm again', function () {

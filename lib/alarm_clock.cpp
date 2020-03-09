@@ -72,11 +72,10 @@ Napi::Value SetAlarm(const Napi::CallbackInfo& info) {
     tsFun.Release();
   };
 
-  // TODO: memory leak
   AlarmTimer *alarm = new AlarmTimer(expirationFn);
 
   auto cancelationFn = [alarm, tsFun](const Napi::CallbackInfo&) mutable -> Napi::Value {
-    delete alarm;
+    AlarmTimer::remove(alarm);
     tsFun.Release();  // no longer required
     return Napi::Value();
   };

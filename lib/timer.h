@@ -1,5 +1,6 @@
 #include <functional>
 #include <chrono>
+#include <set>
 
 #include <time.h> // for timer_t
 
@@ -14,10 +15,14 @@ struct AlarmTimer {
   void set(std::chrono::milliseconds);
 
   void cancel();
+  static void remove(AlarmTimer*);
 
 private:
   timer_callback_t  callback;
   timer_t           timer_id;
+
+  /* This will keep track of existing timers so we don't leak memory */
+  static std::set<AlarmTimer*> g_Alarms;
 
   static void on_timer_expired(union sigval args);
 };

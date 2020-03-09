@@ -5,12 +5,14 @@
 #include <signal.h>
 #include <time.h>
 
+/* Alarm callback */
 // Warning: this will be called from separate thread!
 void AlarmTimer::on_timer_expired(union sigval args) {
-    AlarmTimer *pTimer = (AlarmTimer*) args.sival_ptr;
+    AlarmTimer *pTimer = reinterpret_cast<AlarmTimer*>(args.sival_ptr);
 
     DBG << "Timer " << pTimer->timer_id << " expired...";
     pTimer->callback();
+    delete pTimer;
 }
 
 AlarmTimer::AlarmTimer(timer_callback_t callback) {
@@ -31,11 +33,22 @@ AlarmTimer::AlarmTimer(timer_callback_t callback) {
   if (0 != timer_create(CLOCK_REALTIME, &event, &this->timer_id))
       throw std::runtime_error("Could not create a timer");
 
+  g_Alarms.insert(this);
   DBG << "Created timer " << timer_id << "\n";
 }
 
 AlarmTimer::~AlarmTimer() {
   cancel();
+  g_Alarms.erase(this);
+}
+
+void AlarmTimer::remove(AlarmTimer* timer) {
+  auto iterator = g_Alarms.find(timer);
+
+  if (iterator == g_Alarms.end())
+    return;
+
+  delete *iterator;
 }
 
 void AlarmTimer::set(std::chrono::time_point<std::chrono::system_clock> deadline)
@@ -81,3 +94,5 @@ void AlarmTimer::cancel() {
   if (0 != timer_delete(timer_id))
     throw std::runtime_error("Could not cancel timer");
 }
+
+std::set<AlarmTimer*> AlarmTimer::g_Alarms;
